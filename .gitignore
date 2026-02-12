@@ -1,0 +1,8 @@
+node_modules/
+build/
+.env
+wallets/
+*.keys
+*.jsonl
+npm-debug.log*
+.DS_Store
