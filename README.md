@@ -6,15 +6,19 @@
 
 ## What is this?
 
-This is a bridge between AI agents and the Monero network. It lets any AI assistant – Claude, Cursor, or any MCP-compatible client – check balances, receive payments, and send XMR through a simple tool interface.
+This is a bridge between AI agents and the Monero network. It lets any AI agent –
+OpenClaw, Agent Zero, Claude, or any MCP-compatible framework – check balances,
+receive payments, and send XMR through a simple tool interface.
 
-Think of it as: **your AI gets its own Monero wallet.**
+Think of it as: your AI agent gets its own Monero wallet.
 
 ## Wait, what's MCP?
 
 MCP (Model Context Protocol) is a standard created by Anthropic that lets AI assistants use external tools. Instead of the AI just generating text, it can call real functions – read files, query databases, or in this case, interact with a Monero wallet.
 
-If you've ever wished you could say *"Claude, check my XMR balance"* or *"send 0.5 XMR to this address"* and have it actually happen – that's what this does.
+If you've ever wanted your AI agent to autonomously receive and send XMR –
+whether it's an OpenClaw agent running a service, an Agent Zero instance
+managing its own budget, or just Claude checking your balance – that's what this does.
 
 ## Why Monero? Why not Ethereum or Bitcoin?
 
@@ -104,28 +108,21 @@ MONERO_TRANSFER_COOLDOWN_SECONDS=60
 MONERO_AUDIT_LOG_FILE=./monero-mcp-audit.jsonl
 ```
 
-### Add to Claude Desktop
+### Connect to your agent
 
-Edit your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on Mac):
+This is a standard MCP server using stdio transport.
+Connect it to any MCP-compatible agent or framework.
 
-```json
-{
-  "mcpServers": {
-    "monero": {
-      "command": "node",
-      "args": ["/path/to/monero-mcp-server/build/index.js"],
-      "env": {
-        "MONERO_RPC_HOST": "127.0.0.1",
-        "MONERO_RPC_PORT": "38082",
-        "MONERO_RPC_USER": "user",
-        "MONERO_RPC_PASS": "pass",
-        "MONERO_NETWORK": "stagenet",
-        "MONERO_ALLOW_TRANSFERS": "false"
-      }
-    }
-  }
-}
+Example – start the server manually:
+```bash
+node build/index.js
 ```
+
+The server communicates over stdin/stdout using JSON-RPC (MCP protocol).
+Point your agent framework's MCP client config at the binary and you're good.
+
+Works with OpenClaw, Agent Zero, Claude Code, Cursor,
+any local LLM setup with MCP support – whatever you run.
 
 ### Test with MCP Inspector
 
