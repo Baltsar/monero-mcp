@@ -25,4 +25,8 @@ describe("conversion utilities", () => {
   it("rejects negative XMR", () => {
     expect(() => xmrToAtomic(-0.1)).toThrow("amount_xmr must be greater than or equal to 0");
   });
+
+  it("rejects more than 12 decimal places", () => {
+    expect(() => xmrToAtomic(0.1234567890123)).toThrow("amount_xmr has too many decimal places (max 12)");
+  });
 });

@@ -7,7 +7,7 @@ import type { ConfirmationStore } from "../security/confirm.js";
 import type { TransferRateLimiter } from "../security/ratelimit.js";
 import type { GetBalanceResult, SweepAllResult, TransferResult, ValidateAddressResult } from "../types.js";
 import { atomicToXmrString, sumAtomic, xmrToAtomic } from "../utils/convert.js";
-import { sanitizePotentialPromptInjection, validateMoneroAddressFormat } from "../utils/validate.js";
+import { validateMoneroAddressFormat } from "../utils/validate.js";
 import { enforceAllowlist } from "../security/allowlist.js";
 import type { ToolDefinition } from "./types.js";
 
@@ -107,7 +107,7 @@ export function buildWriteTools(deps: WriteToolDependencies): ToolDefinition[] {
       handler: async (input) => {
         ensureTransferEnabled(deps.config);
 
-        const address = sanitizePotentialPromptInjection(input.address);
+        const address = input.address;
         const amountXmr = input.amount_xmr;
         const priority = parsePriority(input.priority);
 
@@ -219,7 +219,7 @@ export function buildWriteTools(deps: WriteToolDependencies): ToolDefinition[] {
       handler: async (input) => {
         ensureTransferEnabled(deps.config);
 
-        const address = sanitizePotentialPromptInjection(input.address);
+        const address = input.address;
         const priority = parsePriority(input.priority);
 
         try {

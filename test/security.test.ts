@@ -143,6 +143,20 @@ describe("security: write tools", () => {
     expect(rpcCall).not.toHaveBeenCalled();
   });
 
+  it("rejects addresses with whitespace before any RPC call", async () => {
+    const { tools, rpcCall } = createHarness();
+    const transfer = getTool(tools, "transfer");
+
+    await expect(
+      transfer.handler({
+        address: `${MAINNET_ADDRESS_A} `,
+        amount_xmr: 0.1,
+      }),
+    ).rejects.toThrow("Address contains invalid whitespace or control characters");
+
+    expect(rpcCall).not.toHaveBeenCalled();
+  });
+
   it("rejects rapid transfers when cooldown is active", async () => {
     const { tools, rpcCall } = createHarness({
       transferCooldownSeconds: 120,
