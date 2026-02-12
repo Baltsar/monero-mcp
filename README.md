@@ -214,4 +214,4 @@ Inspired by [Monerotopia 2026](https://monerotopia.com) and the simple idea that
 
 *If you find this useful, consider donating XMR to support development:*
 
-`YOUR_XMR_ADDRESS_HERE`
+`45CGtczedKaT6gLHUd2FDebFjGpzio3FzB2AKtx82NxWPF99cfTMeJcCs1XhF9zJTLNVmd6chvMHSNb2symioZkp2f24nfK`
