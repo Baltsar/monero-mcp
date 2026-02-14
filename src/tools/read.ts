@@ -6,6 +6,21 @@ import type { MoneroRpcClient } from "../rpc-client.js";
 import type { GetBalanceResult, JsonRecord, TransferLike } from "../types.js";
 import type { ToolDefinition } from "./types.js";
 
+/** Static guidance for where the wallet lives when using this MCP server (wallet-rpc). No user input, no env, no RPC. */
+const WALLET_SETUP_HELP_TEXT = `Where the Monero wallet lives (when using this MCP server)
+
+The wallet is NOT created or stored by MCP or by Agent Zero. It is created and stored by monero-wallet-rpc wherever that process runs, in the directory set by its --wallet-dir. This MCP server only sends RPC calls to wallet-rpc.
+
+Do NOT run monero-wallet-rpc inside the Agent Zero container. If you do, the wallet lives in that container's filesystem and is lost when the container stops or is recreated.
+
+Where to look:
+- If wallet-rpc runs on the host: the wallet is in the directory you passed as --wallet-dir when starting wallet-rpc (e.g. ~/monero-wallet/). It is NOT necessarily in the standard Monero GUI paths (e.g. ~/Library/Application Support/monero-project/wallets/ on macOS).
+- If wallet-rpc runs in Docker: the wallet is in that container's wallet directory. Use a persistent volume (e.g. wallet-data:/wallet) or a host bind mount (e.g. ./wallet-data:/wallet). Never run "docker compose down -v" if you want to keep the wallet (-v removes volumes).
+
+Backup (required): Write down and securely store the 25-word seed. Back up the wallet file and its .keys file to another location. To restore from seed: monero-wallet-cli --restore-deterministic-wallet.
+
+Verification: If the wallet "disappeared" after a container was recreated, it was likely created inside that container (or in a volume that was removed). For next time, run wallet-rpc on the host or in a separate container with a persistent volume.`;
+
 function formatTransfer(transfer: TransferLike): Record<string, unknown> {
   const formatted: Record<string, unknown> = { ...transfer };
   if (transfer.amount !== undefined) {
@@ -39,6 +54,7 @@ export function buildReadTools(rpc: MoneroRpcClient): ToolDefinition[] {
     label: z.string().min(1).optional(),
   }).strict();
   const makeIntegratedAddressSchema = z.object({ payment_id: z.string().min(1).optional() }).strict();
+  const getWalletSetupHelpSchema = z.object({}).strict();
 
   const tools: ToolDefinition[] = [
     {
@@ -218,6 +234,14 @@ export function buildReadTools(rpc: MoneroRpcClient): ToolDefinition[] {
         }
         return rpc.call("make_integrated_address", params);
       },
+    },
+    {
+      name: "get_wallet_setup_help",
+      description:
+        "Return guidance on where the Monero wallet is stored when using this MCP server (wallet-rpc). Call this only when the user asks where their wallet is, how to find wallet files, or whether the wallet is on the host or in Docker. Do not call for other Monero questions (e.g. balance or address).",
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      schema: getWalletSetupHelpSchema,
+      handler: async () => WALLET_SETUP_HELP_TEXT,
     },
   ];
 
