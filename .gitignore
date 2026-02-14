@@ -12,3 +12,7 @@ npm-debug.log*
 .DS_Store
 .venv/
 transcripts/
+
+# Video assets — do not commit
+VIDEO/
+-VIDEO/
