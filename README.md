@@ -92,7 +92,9 @@ Optional: run the full MCP test script (build + stdio test; runs `npm install` i
 To use this MCP server with [Agent Zero](https://github.com/agent-zero) in Docker:
 
 1. See **[AGENT-ZERO-DOCKER-SETUP.md](AGENT-ZERO-DOCKER-SETUP.md)** for the container run command and volume mount.
-2. In Agent Zero → Settings → MCP, add a server:
+2. **Wallet persistence:** If containers are recreated, the wallet can be lost unless it runs on the host or uses a persistent volume. For the most robust setup, run `monero-wallet-rpc` on the host and point MCP at `host.docker.internal:18083`. Details and backup steps: [AGENT-ZERO-DOCKER-SETUP.md#wallet-persistence-critical](AGENT-ZERO-DOCKER-SETUP.md#wallet-persistence-critical).
+3. **Verification (Agent Zero + Docker):** Before relying on your wallet: (1) Confirm wallet-rpc is **not** running inside the Agent Zero container. (2) Confirm wallet files exist on the host (e.g. `~/monero-wallet/`) or that you use this repo’s `docker compose` (wallet lives in the `wallet-data` volume). Full checklist: [AGENT-ZERO-DOCKER-SETUP.md](AGENT-ZERO-DOCKER-SETUP.md) → Verification.
+4. In Agent Zero → Settings → MCP, add a server:
 
 | Field   | Value |
 |--------|--------|
@@ -126,6 +128,7 @@ To run your own node and download the chain: `docker compose --profile local-nod
 | Problem | What to do |
 |--------|------------|
 | **"no connection to daemon"** | Switch remote node in `docker-compose.yml` (see Remote nodes above) and run `docker compose up -d --force-recreate wallet-rpc`. |
+| **Wallet disappeared after container recreated** | Run wallet-rpc on the host, or use a persistent volume for the wallet dir and never run `docker compose down -v`. See [AGENT-ZERO-DOCKER-SETUP.md](AGENT-ZERO-DOCKER-SETUP.md) → Wallet persistence. |
 | **Empty address in test-connection.sh** | Install `jq` for reliable JSON parsing, or use the script’s built-in grep fallback (ensure wallet-rpc is up and has an open wallet). |
 | **wallet-rpc won’t start** | Check that `entrypoint-wallet.sh` does not add `--rpc-bind-ip` (compose already passes it). You must have `--confirm-external-bind` in the entrypoint for binding to 0.0.0.0. |
 | **test-mcp.sh: "tsc: command not found"** | Run `npm install` in the repo first; the script will also run it automatically if `node_modules` is missing. |
