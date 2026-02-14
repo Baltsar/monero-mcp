@@ -1,0 +1,14 @@
+services:
+  live-transcribe:
+    build:
+      context: ../..
+      dockerfile: deploy/vps/Dockerfile.live
+    container_name: monero-live-transcribe
+    restart: on-failure
+    env_file:
+      - ../../.env.vps
+    volumes:
+      - ../../transcripts:/app/transcripts
+      - ../../deploy/vps/glossary.txt:/app/transcripts/glossary.txt:ro
+    environment:
+      - GLOSSARY_FILE=/app/transcripts/glossary.txt

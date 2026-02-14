@@ -8,7 +8,12 @@
     "build": "tsc -p tsconfig.json",
     "start": "node build/index.js",
     "dev": "tsx src/index.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "transcribe:live": "node scripts/live-transcribe.mjs",
+    "transcribe:summary": "node scripts/summarize-transcript.mjs",
+    "transcribe:live:auto": "node scripts/live-auto-pipeline.mjs",
+    "transcribe:vod:final": "node scripts/final-vod-pass.mjs",
+    "transcribe:status": "node scripts/live-status.mjs"
   },
   "keywords": [
     "mcp",

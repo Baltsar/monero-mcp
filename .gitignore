@@ -1,8 +1,14 @@
 node_modules/
 build/
 .env
+.env.runtime
+.env.vps
 wallets/
+.keys
 *.keys
+audit.jsonl
 *.jsonl
 npm-debug.log*
 .DS_Store
+.venv/
+transcripts/

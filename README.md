@@ -62,7 +62,77 @@ Five defense layers, all configurable:
 
 > This is a tool that can move real money. We built the security for that reality.
 
-## Quick Start
+## Quickstart (5 min)
+
+Get a mainnet receive address and verify the MCP server without downloading the blockchain:
+
+```bash
+git clone <this-repo> && cd monero-mcp
+npm install && npm run build
+docker compose up -d
+./test-connection.sh
+```
+
+You’ll see your **mainnet receive address**. Send XMR to it. To test the MCP handshake (stdio):
+
+```bash
+node test-mcp-stdio.mjs
+```
+
+Optional: run the full MCP test script (build + stdio test; runs `npm install` if needed):
+
+```bash
+./test-mcp.sh
+```
+
+---
+
+## Agent Zero integration
+
+To use this MCP server with [Agent Zero](https://github.com/agent-zero) in Docker:
+
+1. See **[AGENT-ZERO-DOCKER-SETUP.md](AGENT-ZERO-DOCKER-SETUP.md)** for the container run command and volume mount.
+2. In Agent Zero → Settings → MCP, add a server:
+
+| Field   | Value |
+|--------|--------|
+| Name   | `monero` |
+| Command | `node` |
+| Args    | `/monero-mcp/build/index.js` |
+
+**Env:** `MONERO_RPC_HOST=host.docker.internal`, `MONERO_RPC_PORT=18083`, `MONERO_NETWORK=mainnet`, `MONERO_ALLOW_TRANSFERS=false` (read-only).
+
+Copy-paste config and troubleshooting: [AGENT-ZERO-DOCKER-SETUP.md](AGENT-ZERO-DOCKER-SETUP.md).
+
+---
+
+## Remote nodes
+
+The default stack uses a **remote node** (no local blockchain sync). Default daemon in `docker-compose.yml`:
+
+- **Default:** `rucknium.me:18081`
+
+If you get "no connection to daemon", change `--daemon-address` in `docker-compose.yml` to one of these and recreate `wallet-rpc`:
+
+- `xmr-node.cakewallet.com:18081`
+- `node.moneroworld.com:18089`
+
+To run your own node and download the chain: `docker compose --profile local-node up -d`.
+
+---
+
+## Troubleshooting
+
+| Problem | What to do |
+|--------|------------|
+| **"no connection to daemon"** | Switch remote node in `docker-compose.yml` (see Remote nodes above) and run `docker compose up -d --force-recreate wallet-rpc`. |
+| **Empty address in test-connection.sh** | Install `jq` for reliable JSON parsing, or use the script’s built-in grep fallback (ensure wallet-rpc is up and has an open wallet). |
+| **wallet-rpc won’t start** | Check that `entrypoint-wallet.sh` does not add `--rpc-bind-ip` (compose already passes it). You must have `--confirm-external-bind` in the entrypoint for binding to 0.0.0.0. |
+| **test-mcp.sh: "tsc: command not found"** | Run `npm install` in the repo first; the script will also run it automatically if `node_modules` is missing. |
+
+---
+
+## Manual setup (no Docker)
 
 ### Prerequisites
 

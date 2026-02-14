@@ -1,0 +1,60 @@
+# Monero MCP stack: mainnet, remote node by default (no blockchain download).
+# Quick start: docker compose up -d && ./test-connection.sh
+# Optional local node (downloads chain): docker compose --profile local-node up -d
+
+services:
+  wallet-rpc:
+    image: sethsimmons/monero-wallet-rpc:latest
+    container_name: monero-wallet-rpc
+    restart: unless-stopped
+    ports:
+      - "18083:18083"
+    volumes:
+      - wallet-data:/wallet
+      - ./entrypoint-wallet.sh:/entrypoint-wallet.sh:ro
+    entrypoint: ["/bin/sh", "/entrypoint-wallet.sh"]
+    command:
+      - --rpc-bind-ip=0.0.0.0
+      - --rpc-bind-port=18083
+      - --wallet-dir=/wallet
+      - --daemon-address=rucknium.me:18081
+      - --disable-rpc-login
+      - --restore-height=0
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "-X", "POST", "http://localhost:18083/json_rpc", "-H", "Content-Type: application/json", "-d", "{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"get_height\"}"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # Optional: run MCP server in Docker (same host as wallet-rpc)
+  monero-mcp:
+    build: .
+    container_name: monero-mcp
+    restart: unless-stopped
+    environment:
+      MONERO_RPC_HOST: wallet-rpc
+      MONERO_RPC_PORT: "18083"
+      MONERO_NETWORK: mainnet
+      MONERO_ALLOW_TRANSFERS: "false"
+    depends_on:
+      wallet-rpc: { condition: service_healthy }
+    profiles:
+      - mcp
+
+  # Local monerod (downloads full chain). Use only if you want your own node.
+  monerod:
+    image: sethsimmons/monero:latest
+    container_name: monerod
+    restart: unless-stopped
+    ports:
+      - "18081:18081"
+    volumes:
+      - monerod-data:/root/.bitmonero
+    command: ["monerod", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=18081", "--non-interactive"]
+    profiles:
+      - local-node
+
+volumes:
+  wallet-data:
+  monerod-data:
