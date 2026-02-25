@@ -41,6 +41,7 @@ Monero's privacy-by-default design means an agent's transaction history, balance
 | Receiving | `create_address`, `make_integrated_address` |
 | Sending | `transfer`, `sweep_all`, `confirm_transfer` |
 | Validation | `validate_address` |
+| Optional (opt-in) | `get_exchange_rate` (XMR/USD, XMR/EUR; set `MONERO_ENABLE_PRICE_FEED=true`) |
 
 **Read-only by default.** Sending XMR requires explicit opt-in via environment variable.
 
@@ -83,6 +84,60 @@ Optional: run the full MCP test script (build + stdio test; runs `npm install` i
 
 ```bash
 ./test-mcp.sh
+```
+
+## Claude Desktop Integration
+
+Add to your Claude Desktop config
+(`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
+{
+  "mcpServers": {
+    "monero": {
+      "command": "npx",
+      "args": ["-y", "monero-mcp@latest"],
+      "env": {
+        "MONERO_RPC_HOST": "127.0.0.1",
+        "MONERO_RPC_PORT": "18082",
+        "MONERO_NETWORK": "mainnet",
+        "MONERO_ALLOW_TRANSFERS": "false"
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop. Ask: "What's my Monero balance?" to verify.
+
+### Cursor / Claude Code Integration
+
+Add to `.cursor/mcp.json` or Claude Code MCP config:
+
+```json
+{
+  "mcpServers": {
+    "monero": {
+      "command": "npx",
+      "args": ["-y", "monero-mcp@latest"],
+      "env": {
+        "MONERO_RPC_HOST": "127.0.0.1",
+        "MONERO_RPC_PORT": "18082",
+        "MONERO_NETWORK": "stagenet",
+        "MONERO_ALLOW_TRANSFERS": "false"
+      }
+    }
+  }
+}
+```
+
+## Docker
+
+```bash
+docker run -e MONERO_RPC_HOST=host.docker.internal \
+           -e MONERO_RPC_PORT=18082 \
+           -e MONERO_NETWORK=stagenet \
+           ghcr.io/baltsar/monero-mcp:latest
 ```
 
 ---
@@ -224,6 +279,7 @@ npx @modelcontextprotocol/inspector
 | `MONERO_ALLOWED_ADDRESSES` | – | Comma-separated address allowlist |
 | `MONERO_REQUIRE_CONFIRMATION` | `true` | Two-step transfer confirmation |
 | `MONERO_AUDIT_LOG_FILE` | – | Path for JSONL audit log |
+| `MONERO_ENABLE_PRICE_FEED` | `false` | Enable `get_exchange_rate` (external API; see privacy note in .env.example) |
 
 ## Recommended Production Config
 
@@ -253,6 +309,25 @@ Do not use with mainnet funds you can't afford to lose.
 
 If you're a Monero developer or security researcher: tear it apart.
 That's how we make it production-ready.
+
+## ⚠️ Important Warnings
+
+**This software is not audited.** It is early-stage, open-source software that
+interacts with real money. Use at your own risk.
+
+**Your seed phrase is your responsibility.** Write it down. Store it offline.
+If you lose it, your funds are gone permanently. No one can help you.
+
+**AI agents can be manipulated.** The security layers in this server (address
+allowlists, two-step confirmation, rate limiting, audit logging) reduce risk
+but do not eliminate it. Always use all available protections in production.
+
+**Do not use with funds you cannot afford to lose.**
+
+**Start on stagenet.** Test everything there before going near mainnet. Free
+test XMR is available via faucets.
+
+See [DISCLAIMER.md](DISCLAIMER.md) for full details.
 
 ## Contributing
 

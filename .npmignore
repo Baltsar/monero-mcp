@@ -1,0 +1,10 @@
+src/
+test/
+.env
+.env.*
+!.env.example
+tsconfig.json
+.github/
+node_modules/
+monero-mcp-audit.jsonl
+*.log

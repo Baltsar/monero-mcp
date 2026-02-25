@@ -1,0 +1,19 @@
+name: monero-mcp
+description: "MCP server for Monero — give any AI agent a private wallet"
+command: npx
+args:
+  - "-y"
+  - "monero-mcp@latest"
+env:
+  MONERO_RPC_HOST:
+    description: "Monero wallet RPC host"
+    default: "127.0.0.1"
+  MONERO_RPC_PORT:
+    description: "Monero wallet RPC port"
+    default: "18082"
+  MONERO_NETWORK:
+    description: "Network: mainnet, stagenet, or testnet"
+    default: "stagenet"
+  MONERO_ALLOW_TRANSFERS:
+    description: "Enable send operations (security-critical)"
+    default: "false"
