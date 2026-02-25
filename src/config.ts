@@ -13,6 +13,7 @@ export interface Config {
   requireConfirmation: boolean;
   auditLogFile?: string;
   network: MoneroNetwork;
+  enablePriceFeed: boolean;
 }
 
 function parseBoolean(name: string, value: string | undefined, defaultValue: boolean): boolean {
@@ -79,5 +80,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     requireConfirmation: parseBoolean("MONERO_REQUIRE_CONFIRMATION", env.MONERO_REQUIRE_CONFIRMATION, true),
     auditLogFile: env.MONERO_AUDIT_LOG_FILE || undefined,
     network: networkRaw,
+    enablePriceFeed: parseBoolean("MONERO_ENABLE_PRICE_FEED", env.MONERO_ENABLE_PRICE_FEED, false),
   };
 }

@@ -1,29 +1,42 @@
 {
-  "name": "monero-mcp-server",
-  "version": "0.1.0",
-  "description": "Model Context Protocol server for monero-wallet-rpc",
+  "name": "monero-mcp",
+  "version": "0.2.0",
+  "description": "MCP server for Monero. Give any AI agent a private wallet.",
   "type": "module",
   "main": "build/index.js",
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "start": "node build/index.js",
-    "dev": "tsx src/index.ts",
-    "test": "vitest run",
-    "transcribe:live": "node scripts/live-transcribe.mjs",
-    "transcribe:summary": "node scripts/summarize-transcript.mjs",
-    "transcribe:live:auto": "node scripts/live-auto-pipeline.mjs",
-    "transcribe:vod:final": "node scripts/final-vod-pass.mjs",
-    "transcribe:status": "node scripts/live-status.mjs"
+  "bin": {
+    "monero-mcp": "./build/index.js"
   },
-  "keywords": [
-    "mcp",
-    "monero",
-    "wallet",
-    "ai",
-    "typescript"
+  "files": [
+    "build/",
+    "README.md",
+    "LICENSE",
+    ".env.example"
   ],
-  "author": "",
+  "keywords": [
+    "monero",
+    "xmr",
+    "mcp",
+    "model-context-protocol",
+    "ai-agent",
+    "cryptocurrency",
+    "privacy",
+    "wallet"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Baltsar/monero-mcp.git"
+  },
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "prepublishOnly": "npm run build",
+    "test": "node --test test/"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.5",
     "digest-fetch": "^3.1.1",
@@ -32,10 +45,6 @@
   "devDependencies": {
     "@types/node": "^22.10.2",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
-  },
-  "engines": {
-    "node": ">=18"
+    "typescript": "^5.7.2"
   }
 }
